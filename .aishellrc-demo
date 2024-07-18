@@ -1,0 +1,5 @@
+{
+  "API_URL": "",
+  "vector_store_local_path": ".vector_store",
+  "GATEWAY_TOKEN": ""
+}

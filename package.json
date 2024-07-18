@@ -1,0 +1,65 @@
+{
+    "name": "shell-bot",
+    "version": "0.0.1",
+    "type": "module",
+    "description": "A simple shell bot for AI development",
+    "keywords": [
+        "AI",
+        "GPT",
+        "openAI",
+        "development",
+        "tool"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shixin-guo/my-bot/"
+    },
+    "main": "dist/index.js",
+    "bin": {
+        "aisde": "./dist/index.js"
+    },
+    "scripts": {
+        "prepublishOnly": "npm run lint",
+        "build": "tsc",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "tsx src/index.ts",
+        "lint": "eslint --ext .ts .",
+        "format": "prettier --write .",
+        "vue": "tsx src/vue.ts"
+    },
+    "author": {
+        "name": "Young Lee",
+        "email": "joybro201@gmail.com"
+    },
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^18.19.40",
+        "@typescript-eslint/eslint-plugin": "^5.62.0",
+        "@typescript-eslint/parser": "^5.62.0",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^8.10.0",
+        "eslint-config-standard": "^17.1.0",
+        "eslint-plugin-import": "^2.29.1",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "eslint-plugin-promise": "^6.4.0",
+        "prettier": "^2.8.8",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.5.3"
+    },
+    "dependencies": {
+        "@dqbd/tiktoken": "^1.0.15",
+        "@langchain/community": "^0.0.40",
+        "@langchain/core": "^0.1.63",
+        "@langchain/openai": "^0.0.21",
+        "@xenova/transformers": "^2.17.2",
+        "chalk": "^5.3.0",
+        "commander": "^10.0.1",
+        "glob": "^9.3.5",
+        "hnswlib-node": "^3.0.0",
+        "langchain": "^0.1.37",
+        "ora": "^6.3.1",
+        "tsx": "^4.16.2",
+        "vue-template-compiler": "^2.7.16"
+    }
+}

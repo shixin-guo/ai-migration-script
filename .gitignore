@@ -1,0 +1,10 @@
+node_modules
+dist
+.vector_store
+
+package-lock.json
+
+ai-dataset/vue2/
+ai-dataset/vue3/
+result/
+.aishellrc
