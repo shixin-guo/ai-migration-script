@@ -54,7 +54,15 @@ async function main() {
         <START VUE2>
         ${parsedContent.template}
         </END VUE2>
-        NOTE: only return the template part ,and NOT wrap by <template> tag. you are only given a chunk of VUE2 JS code, NOT complete code, and you will ONLY output the corresponding VUE3 code chunk, NOT complete code.
+        ========================================
+        NOTE: 
+          1. only return the template part,and NOT wrap by <template> tag. 
+          2. you are only given a chunk of VUE2 JS code, NOT complete code, and you will ONLY output the corresponding VUE3 code chunk, 
+          3. $t and $tc should NOT be replaced, they are i18n functions
+          4. $router $route they are router functions , replace them with vue-router functions
+          5. <zm-{component}>  "zm-" is a prefix of component name , they have been imported in the script part global, NOT import them again
+          NOT complete code.
+        ========================================
         Now, the translated VUE3 code is
       `)]);
     const scriptRes = parsedContent.script && await chat.invoke([new HumanMessage(
@@ -63,13 +71,62 @@ async function main() {
         <START VUE2>
         ${parsedContent.script}
         </END VUE2>
-        NOTE: you are only given a chunk of VUE2 JS code, NOT complete code, and you will ONLY output the corresponding VUE3 code chunk, NOT complete code.
-        Now, Do not use the <script setup> language feature , we need use composition api  the translated VUE3 code is
+        ========================================
+        NOTE: 
+          1. you are only given a chunk of VUE2 JS code, NOT complete code, and you will ONLY output the corresponding VUE3 code chunk, NOT complete code.
+          2. EventBus().$on() EventBus().$off() EventBus().$emit() has been refactored, now it use the mitt library, so should be replaced by EventBus().on() EventBus().off() EventBus().emit() and so on
+          3. when using $t and $tc should NOT be replaced, they are i18n functions, use them after import them in the script part like this 
+            <DEMO-CODE>
+            import { useI18n } from "vue-i18n";
+            const { t: $t } = useI18n();
+            </DEMO-CODE>
+          4. NOT delete the comments in the code.
+          5. $message $notify have been move into ZmToast , so you need import ZmToast and use it instead of them, and keep the same config
+             for example:
+              <DEMO-CODE>
+                import ZmToast from 'zm-toast';
+                const { appContext } = getCurrentInstance(); // get appContext, already imported globally
+                ZmToast(
+                  {
+                    type: "success", // success / info / warning / error
+                    message: successMessage,
+                    ...moreConfig,
+                  },
+                  appContext,
+                );
+              </DEMO-CODE>
+            6. $alert、$confirm  $prompt move into ZmMessageBox, so you need import ZmMessageBox and use it instead of them, and keep the same config
+                <DEMO-CODE>  
+                  import { ZmMessageBox, ZmToast } from "@zoom/zoom-ui-vue3";
+                    const {appContext} = getCurrentInstance()!
+                      function open() {
+                        ZmMessageBox.alert(
+                          Message,
+                          Title,
+                          {
+                            confirmButtonText: 'OK'
+                          },
+                          appContext // for i18n
+                        )
+                          .then((resolvedReason: Action) => {
+                            console.log(resolvedReason)
+                          })
+                          .catch((rejectReason: Action) => {
+                            console.log(rejectReason)
+                          })
+                      }
+                  </DEMO-CODE>
+          7. $router $route they are router functions ,import vue router and replace them with vue-router functions such as useRoute() useRouter() and so on
+          8. .$set() .$delete() .$watch() should be replaced by the corresponding methods in the composition api
+          9. Do not use the <script setup> language feature , we need use composition api  
+        ========================================
+        Now, the translated VUE3 code is
       `)])
     const styleRes = parsedContent.styles
     // const tempRes = parsedContent.template
     // const scriptRes = parsedContent.script
 
+    // style no need to translate, need change by hand
     const stylesList = styleRes.map(r => 
       `<style lang="${r.lang}" ${r.scoped? 'scoped' : ''}>
         ${r.content}
@@ -87,7 +144,11 @@ async function main() {
         <START CODE>
         ${content}
         </END CODE>
-        NOTE: you are only given a chunk of JS code, NOT complete code, and you will ONLY output the corresponding typescript code chunk, NOT complete code.
+        ========================================
+        NOTE: 
+          1. you are only given a chunk of JS code, NOT complete code, and you will ONLY output the corresponding typescript code chunk, NOT complete code. 
+          2. NOT delete the comments in the code.
+        ========================================
         Now, the translated code is
       `)]);
     return `${removeJsonTags(tempRes)}`
