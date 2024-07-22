@@ -9,8 +9,8 @@ import { parseVueFile } from './vuePipeline';
 import { HumanMessage } from '@langchain/core/messages';
 
 
-const sourceDir = 'source-code/js'; // 原始文件夹
-const resultDir = 'source-code/js'; // 结果文件夹
+const sourceDir = 'source-code/shared'; // 原始文件夹
+const resultDir = 'source-code/shared'; // 结果文件夹
 
 
 function removeJsonTags(input: string): string {
