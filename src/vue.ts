@@ -9,9 +9,39 @@ import { parseVueFile } from './vuePipeline';
 import { HumanMessage } from '@langchain/core/messages';
 
 
-const sourceDir = 'source-code/shared'; // 原始文件夹
-const resultDir = 'source-code/shared'; // 结果文件夹
+const sourceDir = 'source-code'; // input folder
+const resultDir = 'source-code'; // output folder
 
+
+
+async function renameJsToTs(directoryPath: string): Promise<void> {
+  if (!directoryPath) {
+    console.error('pls supply the directory path');
+    return;
+  }
+
+  try {
+    const entries = await fs.promises.readdir(directoryPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(directoryPath, entry.name);
+
+      if (entry.isDirectory()) {
+        await renameJsToTs(fullPath);
+      } else if (entry.isFile() && path.extname(entry.name) === '.js') {
+        const newFilePath = fullPath.slice(0, -3) + '.ts';
+        try {
+          await fs.promises.rename(fullPath, newFilePath);
+        } catch (renameError) {
+          console.error(`error: when rename:  ${fullPath}:`, renameError);
+        }
+      }
+    }
+
+  } catch (readDirError) {
+    console.error('Can not read this dir:', readDirError);
+  }
+}
 
 function removeJsonTags(input: string): string {
   return input.replace(/^```(json|css|html|vue|javascript|typescript|scss)|```$/gm, '');
@@ -46,7 +76,6 @@ async function main() {
 
   const translateVue = async(content: any) => {
     const parsedContent = parseVueFile(content);
-    console.log(parsedContent.template);
     console.log('-------------------');
     const tempRes = parsedContent.template && await chat.invoke([new HumanMessage(
       `You are a code translator who will translate a chunk of VUE2 javascript code to a corresponding VUE3 typescript code. You will just translate and output the VUE3 JS code directly without a preamble.
@@ -119,6 +148,7 @@ async function main() {
           7. $router $route they are router functions ,import vue router and replace them with vue-router functions such as useRoute() useRouter() and so on
           8. .$set() .$delete() .$watch() should be replaced by the corresponding methods in the composition api
           9. Do not use the <script setup> language feature , we need use composition api  
+          10. Use Pinia for state management, replace Vuex
         ========================================
         Now, the translated VUE3 code is
       `)])
@@ -148,6 +178,8 @@ async function main() {
         NOTE: 
           1. you are only given a chunk of JS code, NOT complete code, and you will ONLY output the corresponding typescript code chunk, NOT complete code. 
           2. NOT delete the comments in the code.
+          3. If using Vue2, you should replace the Vue2 options API with the Vue3 composition API and Vue3 ecosystem
+          4. If using Vuex, you should replace the Vuex with the Pinia
         ========================================
         Now, the translated code is
       `)]);
@@ -191,6 +223,7 @@ async function main() {
   
   console.time('Translation Time');
   await translateFolder(sourceDir, resultDir)
+  await renameJsToTs(resultDir);
   console.timeEnd('Translation Time');
   console.log('Done！！！！！！');
   process.exit(0);

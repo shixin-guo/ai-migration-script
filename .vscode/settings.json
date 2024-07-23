@@ -3,6 +3,7 @@
         "hnswlib",
         "langchain",
         "openai",
+        "Pinia",
         "vectorstores"
     ]
 }
