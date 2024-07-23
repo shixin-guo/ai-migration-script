@@ -47,19 +47,6 @@ function removeJsonTags(input: string): string {
   return input.replace(/^```(json|css|html|vue|javascript|typescript|scss)|```$/gm, '');
 }
 
-async function countFilesInFolder(source: string): Promise<number> {
-  let count = 0;
-  const items = await fs.promises.readdir(source, { withFileTypes: true });
-  for (const item of items) {
-    const sourcePath = path.join(source, item.name);
-    if (item.isDirectory()) {
-      count += await countFilesInFolder(sourcePath);
-    } else if (item.isFile() && supportLangs.includes(path.extname(sourcePath) as SupportLangs)) {
-      count++;
-    }
-  }
-  return count;
-}
 
 const supportLangs = ['.vue', '.js'] as const;
 type SupportLangs = typeof supportLangs[number];
@@ -195,17 +182,18 @@ async function main() {
   }
 
   async function translateFile(filePath: string, targetPath: string, fileType: SupportLangs): Promise<void> {
-  
+    // console.log(`Translating ${filePath}`);
     const content = await fs.promises.readFile(filePath, 'utf-8');
-    const translated = await translate(content, fileType);
+    const translated = await translate(content, fileType).catch(e => {
+      console.log('error', e,filePath );
+    });
     
     await fs.promises.mkdir(path.dirname(targetPath), { recursive: true });
-    await fs.promises.writeFile(targetPath, translated);
-    console.log(`Translated: ${filePath} -> ${targetPath}`);
+    translated && await fs.promises.writeFile(targetPath, translated);
+    console.log(`${filePath}`);
   }
   
   async function translateFolder(source: string, target: string): Promise<void> {
-    const totalFiles = await countFilesInFolder(source);
     let translatedFiles = 0;
     const items = await fs.promises.readdir(source, { withFileTypes: true });
     for (const item of items) {
@@ -216,7 +204,6 @@ async function main() {
       } else if (item.isFile() && supportLangs.includes(path.extname(sourcePath) as SupportLangs)) {
         await translateFile(sourcePath, targetPath, path.extname(sourcePath) as SupportLangs);
         translatedFiles++;
-        console.log(`Progress: ${translatedFiles}/${totalFiles} files translated.`);
       }
     }
   }
