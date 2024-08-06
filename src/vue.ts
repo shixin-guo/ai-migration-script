@@ -172,6 +172,44 @@ async function main() {
       `)]);
     return `${removeJsonTags(tempRes)}`
   }
+  const translateVuex = async(content: any) => {
+    const tempRes = content && await chat.invoke([new HumanMessage(
+      `You are a code translator who will translate a chunk of javascript Vuejs vuex code to a corresponding typescript Vuejs Pinia code. 
+        Migrating from Vuex to Pinia
+        You will just translate and output the typescript code directly without a preamble.
+        The Javascript code is
+        <START CODE>
+        ${content}
+        </END CODE>
+        ========================================
+        NOTE: 
+          1. you are only given a chunk of JS code, NOT complete code, and you will ONLY output the corresponding typescript code chunk, NOT complete code. 
+          2. NOT delete the comments in the code.
+          3. you should Migrating from Vuex to Pinia
+          4. follow this code style: 
+          defineStore('personalList', {
+              state() {
+                return {
+                  isLoading: false,
+                  ...
+                }
+              },
+              actions: {
+                changeLoading(isFullLoading) {
+                  const { isLoading} = this
+                  this.isLoading = isFullLoading
+                },
+                ...
+              },
+              getters: {
+                ...
+              }
+            })
+        ========================================
+        Now, the translated code is
+      `)]);
+    return `${removeJsonTags(tempRes)}`
+  }
   const translate = async (content: string, fileType: SupportLangs) => {
     if (fileType === '.vue') {
       return await translateVue(content);
