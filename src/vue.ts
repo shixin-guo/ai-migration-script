@@ -111,9 +111,9 @@ async function main() {
                   appContext,
                 );
               </DEMO-CODE>
-            6. $alert、$confirm  $prompt move into ZmMessageBox, so you need import ZmMessageBox and use it instead of them, and keep the same config
+            6. $alert、$confirm  $prompt move into ZmMessageBox, so you need import ZmMessageBox when you need  use $alert、$confirm  $prompt, and keep the same config
                 <DEMO-CODE>  
-                  import { ZmMessageBox, ZmToast } from "@zoom/zoom-ui-vue3";
+                  import { ZmMessageBox } from "@zoom/zoom-ui-vue3";
                     const {appContext} = getCurrentInstance()!
                       function open() {
                         ZmMessageBox.alert(
@@ -136,6 +136,9 @@ async function main() {
           8. .$set() .$delete() .$watch() should be replaced by the corresponding methods in the composition api
           9. Do not use the <script setup> language feature , we need use composition api  
           10. Use Pinia for state management, replace Vuex
+          11. NOT delete the comments in the code. 
+          12. change the internal path alias from @xxx to @/xxx , but donot change the external path alias such as @zoom/xxx
+          13. if you find it is a vue mixin, you should replace it with a composition function hooks, add add a comment start with // @todo mixin in the code where you using this mixin
         ========================================
         Now, the translated VUE3 code is
       `)])
@@ -156,7 +159,7 @@ async function main() {
   }
   const translateJS = async(content: any) => {
     const tempRes = content && await chat.invoke([new HumanMessage(
-      `You are a code translator who will translate a chunk of javascript code to a corresponding typescript code. You will just translate and output the typescript code directly without a preamble.
+      `You are a code translator who will translate a chunk of vue mixin javascript code to a corresponding typescript code. You will just translate and output the vue3 hooks typescript code directly without a preamble.
         The Javascript code is
         <START CODE>
         ${content}
@@ -167,6 +170,8 @@ async function main() {
           2. NOT delete the comments in the code.
           3. If using Vue2, you should replace the Vue2 options API with the Vue3 composition API and Vue3 ecosystem
           4. If using Vuex, you should replace the Vuex with the Pinia
+          5. change the internal path alias from @xxx to @/xxx , but donot change the external path alias such as @zoom/xxx
+          6. if you find it is a vue mixin, you should replace it with a composition function hooks
         ========================================
         Now, the translated code is
       `)]);
