@@ -91,16 +91,18 @@ async function main() {
         NOTE: 
           1. you are only given a chunk of VUE2 JS code, NOT complete code, and you will ONLY output the corresponding VUE3 code chunk, NOT complete code.
           2. EventBus().$on() EventBus().$off() EventBus().$emit() has been refactored, now it use the mitt library, so should be replaced by EventBus().on() EventBus().off() EventBus().emit() and so on
-          3. when using $t and $tc should NOT be replaced, they are i18n functions, use them after import them in the script part like this 
+          3. when using $t and $tc should NOT be replaced, they are i18n functions, use them after import them in the script part and use useI18n hooks inside of setup() function. like this 
             <DEMO-CODE>
             import { useI18n } from "vue-i18n";
-            const { t: $t } = useI18n();
+            setup(props, { emit }) {
+                const { t: $t } = useI18n();
+            }   
             </DEMO-CODE>
           4. NOT delete the comments in the code.
           5. $message $notify have been move into ZmToast , so you need import ZmToast and use it instead of them, and keep the same config
              for example:
               <DEMO-CODE>
-                import ZmToast from 'zm-toast';
+                import {ZmToast} from '@zoom/zoom-ui-vue3';
                 const { appContext } = getCurrentInstance(); // get appContext, already imported globally
                 ZmToast(
                   {
@@ -111,7 +113,7 @@ async function main() {
                   appContext,
                 );
               </DEMO-CODE>
-            6. $alert、$confirm  $prompt move into ZmMessageBox, so you need import ZmMessageBox when you need  use $alert、$confirm  $prompt, and keep the same config
+            6. $alert、$confirm  $prompt move into ZmMessageBox, so you need import ZmMessageBox (only when you need it). and keep the same using way
                 <DEMO-CODE>  
                   import { ZmMessageBox } from "@zoom/zoom-ui-vue3";
                     const {appContext} = getCurrentInstance()!
@@ -135,10 +137,29 @@ async function main() {
           7. $router $route they are router functions ,import vue router and replace them with vue-router functions such as useRoute() useRouter() and so on
           8. .$set() .$delete() .$watch() should be replaced by the corresponding methods in the composition api
           9. Do not use the <script setup> language feature , we need use composition api  
-          10. Use Pinia for state management, replace Vuex
+          10. Use Pinia for state management, replace Vuex, donot need import Pinia, since I have already define some stores in stores folder include these store : (analytic/       currentUser.ts  deal/           filters/        mobile/         savableFilters/
+              coaching/       dashboard/      dialer/         history/        playlist/       share/), 
+              so you just need import them when you need them 
+              such as: 
+              <DEMO-CODE>  
+              import { usePlaylistStore } from "@/stores/playlist"; // Assuming you have a Pinia store for playlist
+              import { useCurrentUserStore } from "@/stores/currentUser";
+              export default defineComponent({
+                name: "AddToPlaylist",
+                setup(props) {
+                  const currentUser = useCurrentUserStore();
+                  const playlistStore = usePlaylistStore();
+                  .....
+                  .....
+                }
+              )
+              </DEMO-CODE>  
+
           11. NOT delete the comments in the code. 
           12. change the internal path alias from @xxx to @/xxx , but donot change the external path alias such as @zoom/xxx
           13. if you find it is a vue mixin, you should replace it with a composition function hooks, add add a comment start with // @todo mixin in the code where you using this mixin
+          14. if you find vue2 code is using render h() function ,you should migrate to vue3 return h() function (not jsx syntax) for creating vnodes and use composition syntax  : 
+          15. don't rename any ref , keep same, if you find any existing ref is using, remember to define it in the setup function
         ========================================
         Now, the translated VUE3 code is
       `)])
